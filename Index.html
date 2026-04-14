@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Zebito's Missão: Combustível</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: #0d1a0d; display: flex; align-items: center; justify-content: center; font-family: 'Segoe UI', Arial, sans-serif; }
+#zroot { width: 100%; max-width: 480px; height: 100vh; max-height: 720px; position: relative; }
+.zscreen { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; overflow: hidden; border-radius: 0; }
+.zscreen.active { display: flex; }
+
+#zs-home {
+  background: #1a2e1a; justify-content: center; padding: 28px 20px 20px; gap: 0;
+}
+.z-road-bg { position: absolute; bottom: 0; left: 0; right: 0; height: 150px; background: #2c2c2c; }
+.z-road-line { position: absolute; bottom: 66px; height: 6px; width: 36px; background: #e8c84a; border-radius: 2px; }
+.z-title-wrap { position: relative; z-index: 2; text-align: center; margin-bottom: 8px; }
+.z-title { font-size: 52px; font-weight: 900; color: #e8c84a; letter-spacing: -1px; line-height: 1; text-transform: uppercase; }
+.z-title span { color: #ff4444; }
+.z-title2 { font-size: 24px; font-weight: 900; color: #ff6b35; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+.z-sub { font-size: 12px; color: #8fbc6a; letter-spacing: 2px; text-transform: uppercase; margin-top: 6px; }
+.z-car-home { position: relative; z-index: 2; font-size: 56px; margin: 14px 0 4px; animation: zhonk 1.8s ease-in-out infinite; }
+@keyframes zhonk { 0%,100%{transform:rotate(-2deg) translateY(0)} 50%{transform:rotate(2deg) translateY(-6px)} }
+.z-tagline { position: relative; z-index: 2; font-size: 15px; color: #c8e6a0; text-align: center; margin-bottom: 22px; line-height: 1.6; max-width: 300px; }
+.zbtn-main {
+  background: #e8c84a; color: #1a1a1a; border: none; border-radius: 40px;
+  padding: 16px 56px; font-size: 22px; font-weight: 900; cursor: pointer;
+  position: relative; z-index: 2;
+  box-shadow: 0 5px 0 #b8920a;
+  transition: transform .1s, box-shadow .1s;
+  text-transform: uppercase; letter-spacing: 2px;
+}
+.zbtn-main:active { transform: translateY(4px); box-shadow: 0 1px 0 #b8920a; }
+.z-home-stats { position: relative; z-index: 2; display: flex; gap: 12px; margin-top: 18px; }
+.zstat { background: rgba(255,255,255,0.08); border-radius: 14px; padding: 8px 18px; text-align: center; }
+.zstat .v { font-size: 24px; font-weight: 900; color: #e8c84a; line-height: 1; }
+.zstat .l { font-size: 10px; color: #8fbc6a; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+#zs-game { background: #2a4a2a; }
+#zcanvas { display: block; touch-action: none; width: 100%; height: 100%; }
+
+#zs-over {
+  background: #111820; justify-content: flex-start; padding: 28px 20px; align-items: center; overflow-y: auto;
+}
+.zo-icon { font-size: 56px; margin-bottom: 6px; }
+.zo-title { font-size: 30px; font-weight: 900; color: #e8c84a; text-transform: uppercase; letter-spacing: 3px; }
+.zo-msg { font-size: 14px; color: #8fbc6a; margin: 6px 0 18px; text-align: center; max-width: 300px; }
+.zo-card {
+  background: #1e2d1e; border: 1px solid #2e4a2e;
+  border-radius: 16px; padding: 18px 24px; width: 100%; max-width: 360px; margin-bottom: 16px;
+}
+.zo-slabel { font-size: 11px; color: #5a7a5a; text-transform: uppercase; letter-spacing: 2px; text-align: center; margin-bottom: 4px; }
+.zo-score { font-size: 54px; font-weight: 900; color: #e8c84a; text-align: center; line-height: 1; }
+.zo-row { display: flex; justify-content: space-around; margin-top: 14px; padding-top: 14px; border-top: 1px solid #2e4a2e; }
+.zo-vv { font-size: 22px; font-weight: 800; color: #c8e6a0; text-align: center; }
+.zo-ll { font-size: 10px; color: #5a7a5a; text-align: center; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+.znew { background: #e8c84a; color: #1a1a1a; border-radius: 20px; padding: 4px 16px; font-size: 13px; font-weight: 900; margin: 0 auto 12px; display: none; }
+.znew.show { display: block; }
+.zbtns { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 360px; }
+.zbtn-retry {
+  background: #e8c84a; color: #1a1a1a; border: none; border-radius: 40px;
+  padding: 14px; font-size: 18px; font-weight: 900; cursor: pointer;
+  box-shadow: 0 4px 0 #b8920a; text-align: center; text-transform: uppercase; letter-spacing: 1px;
+}
+.zbtn-home {
+  background: rgba(255,255,255,0.08); color: #c8e6a0;
+  border: 1px solid rgba(255,255,255,0.15); border-radius: 40px;
+  padding: 12px; font-size: 15px; font-weight: 700; cursor: pointer; text-align: center;
+}
+</style>
+</head>
+<body>
+<div id="zroot">
+
+  <!-- HOME -->
+  <div id="zs-home" class="zscreen active">
+    <div class="z-road-bg">
+      <div class="z-road-line" style="left:14%"></div>
+      <div class="z-road-line" style="left:47%"></div>
+      <div class="z-road-line" style="left:74%"></div>
+    </div>
+    <div class="z-title-wrap">
+      <div class="z-title">Zebito<span>'s</span></div>
+      <div class="z-title2">Missão: Combustível</div>
+      <div class="z-sub">Maputo · Driving Survival</div>
+    </div>
+    <div class="z-car-home">🚗</div>
+    <div class="z-tagline">
+      Maputo ficou sem combustível.<br>
+      Zebito precisa de abastecer —<br>
+      mas <strong>qual bomba tem stock?</strong>
+    </div>
+    <button class="zbtn-main" id="zbtn-start">▶ ARRANCAR</button>
+    <div class="z-home-stats">
+      <div class="zstat"><div class="v" id="zhs">0</div><div class="l">Recorde</div></div>
+      <div class="zstat"><div class="v" id="zbest-km">0</div><div class="l">Melhor km</div></div>
+      <div class="zstat"><div class="v" id="zruns">0</div><div class="l">Tentativas</div></div>
+    </div>
+  </div>
+
+  <!-- GAME -->
+  <div id="zs-game" class="zscreen">
+    <canvas id="zcanvas"></canvas>
+  </div>
+
+  <!-- GAME OVER -->
+  <div id="zs-over" class="zscreen">
+    <div class="zo-icon" id="zo-ico">⛽</div>
+    <div class="zo-title">SEM COMBUSTÍVEL</div>
+    <div class="zo-msg" id="zo-msg">O Zebito ficou parado no meio da EN1!</div>
+    <div class="znew" id="znew-best">🏆 NOVO RECORDE!</div>
+    <div class="zo-card">
+      <div class="zo-slabel">PONTUAÇÃO</div>
+      <div class="zo-score" id="zo-score">0</div>
+      <div class="zo-row">
+        <div><div class="zo-vv" id="zo-km">0km</div><div class="zo-ll">Distância</div></div>
+        <div><div class="zo-vv" id="zo-abast">0</div><div class="zo-ll">Abastec.</div></div>
+        <div><div class="zo-vv" id="zo-vazias">0</div><div class="zo-ll">Vazias</div></div>
+      </div>
+    </div>
+    <div class="zbtns">
+      <button class="zbtn-retry" id="zbtn-retry">🔄 TENTAR DE NOVO</button>
+      <button class="zbtn-home" id="zbtn-home">🏠 INÍCIO</button>
+    </div>
+  </div>
+
+</div>
+<script>
+const $ = id => document.getElementById(id);
+function show(id) {
+  document.querySelectorAll('.zscreen').forEach(s => s.classList.remove('active'));
+  $(id).classList.add('active');
+}
+
+let HS   = +localStorage.getItem('zeb_hs')  || 0;
+let BKM  = +localStorage.getItem('zeb_km')  || 0;
+let RUNS = +localStorage.getItem('zeb_runs')|| 0;
+function updateHome() { $('zhs').textContent=HS; $('zbest-km').textContent=BKM; $('zruns').textContent=RUNS; }
+updateHome();
+
+$('zbtn-start').onclick = () => { show('zs-game'); startGame(); };
+$('zbtn-retry').onclick = () => { show('zs-game'); startGame(); };
+$('zbtn-home').onclick  = () => { show('zs-home'); updateHome(); };
+
+const canvas = $('zcanvas');
+const ctx    = canvas.getContext('2d');
+let W, H;
+
+function resize() {
+  const root = $('zroot');
+  W = canvas.width  = root.clientWidth  || 420;
+  H = canvas.height = root.clientHeight || 680;
+}
+resize();
+window.addEventListener('resize', () => { resize(); });
+
+const PUMP_NAMES   = ['Galp','Puma','Petromoc','Oryx','Engen','Bharat','Total'];
+const SUBURB_NAMES = ['Sommerschield','Polana','Maxaquene','Malhangalene','Matola','Zimpeto','Benfica','Machava','Costa do Sol','Bairro Central'];
+const MSGS_EMPTY   = [
+  'O Zebito ficou parado no meio da EN1!',
+  'Carro parado na Av. Julius Nyerere!',
+  'Stranded em frente ao Mercado Central!',
+  'Motor apagou perto do Hotel Polana!',
+  'Zebito a empurrar o carro na Marginal...',
+  'Avaria total na Av. Eduardo Mondlane!',
+];
+
+let G, raf, keys, touchStart, lastT;
+
+function startGame() {
+  cancelAnimationFrame(raf);
+  resize();
+  keys = {};
+  G = {
+    running: true,
+    score: 0, km: 0, abasteceu: 0, vazias: 0,
+    fuel: 65, fuelMax: 100,
+    speed: 2.2, speedBase: 2.2,
+    car: { x: W / 2, y: H * 0.72, angle: 0, vx: 0 },
+    roadOffset: 0,
+    pumps: [],
+    pumpSpawnDist: 0,
+    particles: [],
+    msg: null, msgT: 0,
+    suburb: SUBURB_NAMES[0], suburbT: 0,
+    flashFuel: 0,
+  };
+  for (let i = 0; i < 3; i++) spawnPump(-(i + 1) * H * 0.65);
+  attachInput();
+  lastT = performance.now();
+  raf = requestAnimationFrame(loop);
+}
+
+function spawnPump(forcedY) {
+  const side   = Math.random() < 0.5 ? 'left' : 'right';
+  const hasFuel = Math.random() < 0.45;
+  const name   = PUMP_NAMES[Math.floor(Math.random() * PUMP_NAMES.length)];
+  const px     = side === 'left' ? W * 0.11 : W * 0.89;
+  G.pumps.push({
+    x: px,
+    y: forcedY !== undefined ? forcedY : -H * 0.25 - Math.random() * H * 0.2,
+    side, hasFuel, name,
+    revealed: false, used: false, pulseT: 0,
+  });
+}
+
+function attachInput() {
+  document.onkeydown = e => { if (G && G.running) keys[e.key] = true; };
+  document.onkeyup   = e => { keys[e.key] = false; };
+  canvas.ontouchstart = e => {
+    touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    e.preventDefault();
+  };
+  canvas.ontouchmove = e => {
+    if (!touchStart || !G || !G.running) return;
+    const dx = e.touches[0].clientX - touchStart.x;
+    const dy = e.touches[0].clientY - touchStart.y;
+    G.car.vx = dx * 0.045;
+    if (Math.abs(dy) > 8) G.speed = Math.max(1, G.speedBase - dy * 0.015);
+    e.preventDefault();
+  };
+  canvas.ontouchend = () => { touchStart = null; G.car.vx = 0; };
+}
+
+function loop(ts) {
+  const dt = Math.min(ts - lastT, 50);
+  lastT = ts;
+  update(dt);
+  draw();
+  if (G.running) raf = requestAnimationFrame(loop);
+}
+
+function update(dt) {
+  const spd = G.speed;
+
+  if (keys['ArrowLeft']  || keys['a']) G.car.vx = Math.max(G.car.vx - 0.45, -7);
+  else if (keys['ArrowRight'] || keys['d']) G.car.vx = Math.min(G.car.vx + 0.45, 7);
+  else G.car.vx *= 0.82;
+  if (keys['ArrowUp']   || keys['w']) G.speed = Math.min(G.speed + 0.06, G.speedBase + 3);
+  if (keys['ArrowDown'] || keys['s']) G.speed = Math.max(G.speed - 0.06, 0.8);
+
+  G.car.x += G.car.vx;
+  G.car.x = Math.max(W * 0.22, Math.min(W * 0.78, G.car.x));
+  G.car.angle = G.car.vx * 0.055;
+
+  G.roadOffset = (G.roadOffset + spd * dt * 0.065) % (H * 0.13);
+  G.fuel -= (spd * 0.0042 + 0.0028) * dt * 0.1;
+  if (G.fuel <= 0) { G.fuel = 0; endGame(); return; }
+
+  G.km    += spd * dt * 0.00016;
+  G.score += Math.round(spd * dt * 0.042);
+  G.speed  = Math.min(G.speedBase + G.km * 0.045, 11);
+
+  if (G.msgT    > 0) G.msgT    -= dt;
+  if (G.flashFuel > 0) G.flashFuel -= dt;
+  if (G.suburbT > 0) { G.suburbT -= dt; }
+  else { G.suburb = SUBURB_NAMES[Math.floor(Math.random() * SUBURB_NAMES.length)]; G.suburbT = 7000 + Math.random() * 5000; }
+
+  for (let i = G.pumps.length - 1; i >= 0; i--) {
+    const p = G.pumps[i];
+    p.y      += spd * dt * 0.065;
+    p.pulseT += dt;
+    if (p.y > H + 100) { G.pumps.splice(i, 1); continue; }
+    if (!p.revealed && p.y > -H * 0.05) p.revealed = true;
+    if (!p.used && p.revealed) {
+      const dx = Math.abs(G.car.x - p.x);
+      const dy = Math.abs(G.car.y - p.y);
+      if (dx < W * 0.13 && dy < H * 0.065) {
+        p.used = true;
+        if (p.hasFuel) {
+          G.fuel = Math.min(G.fuelMax, G.fuel + 38);
+          G.abasteceu++;
+          G.score += 500;
+          showMsg('✅ ' + p.name + ' tem stock! Tanque cheio!', '#4CAF50');
+          burst(p.x, p.y, '#4CAF50');
+        } else {
+          G.vazias++;
+          G.score = Math.max(0, G.score - 120);
+          G.fuel  = Math.max(0, G.fuel - 9);
+          showMsg('❌ ' + p.name + ' está vazia! Combustível perdido!', '#ff4444');
+          burst(p.x, p.y, '#ff4444');
+          G.flashFuel = 700;
+        }
+      }
+    }
+  }
+
+  G.pumpSpawnDist += spd * dt * 0.065;
+  if (G.pumpSpawnDist > H * 0.52) { spawnPump(); G.pumpSpawnDist = 0; }
+
+  for (let i = G.particles.length - 1; i >= 0; i--) {
+    const p = G.particles[i];
+    p.x += p.vx; p.y += p.vy; p.vy += 0.18; p.life -= dt;
+    if (p.life <= 0) G.particles.splice(i, 1);
+  }
+}
+
+function showMsg(txt, col) { G.msg = { txt, col }; G.msgT = 2400; }
+function burst(x, y, col) {
+  for (let i = 0; i < 16; i++) {
+    const a = Math.random() * Math.PI * 2, sp = 1.5 + Math.random() * 4.5;
+    G.particles.push({ x, y, vx: Math.cos(a)*sp, vy: Math.sin(a)*sp - 3, col, life: 700 + Math.random()*300, size: 3 + Math.random()*5 });
+  }
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  drawSky();
+  drawBuildings();
+  drawRoad();
+  G.pumps.forEach(p => drawPump(p));
+  G.particles.forEach(p => {
+    ctx.globalAlpha = Math.max(0, p.life / 700);
+    ctx.fillStyle = p.col;
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+  });
+  ctx.globalAlpha = 1;
+  drawCar();
+  drawHUD();
+}
+
+function drawSky() {
+  ctx.fillStyle = '#1e3a1e'; ctx.fillRect(0, 0, W, H * 0.18);
+}
+
+function drawBuildings() {
+  const bdata = [
+    { x: 0,    w: .11, h: .3 },
+    { x: .12,  w: .07, h: .19 },
+    { x: .76,  w: .13, h: .34 },
+    { x: .88,  w: .1,  h: .22 },
+  ];
+  bdata.forEach(b => {
+    ctx.fillStyle = '#172e17';
+    ctx.fillRect(b.x * W, H * (0.18 - b.h), b.w * W, b.h * H);
+    ctx.fillStyle = 'rgba(255,220,80,0.15)';
+    for (let wy = 8; wy < b.h * H - 12; wy += 17)
+      for (let wx = 6; wx < b.w * W - 6; wx += 14)
+        if (Math.random() > 0.35)
+          ctx.fillRect(b.x * W + wx, H * (0.18 - b.h) + wy, 8, 10);
+  });
+  ctx.fillStyle = '#1a3a1a'; ctx.fillRect(0, H * 0.17, W, H * 0.03);
+}
+
+function drawRoad() {
+  const rw = W * 0.52, rx = (W - rw) / 2;
+  ctx.fillStyle = '#1c1c1c'; ctx.fillRect(rx, H * 0.18, rw, H);
+  ctx.fillStyle = '#7a6a4a';
+  ctx.fillRect(rx - W * 0.07, H * 0.18, W * 0.07, H);
+  ctx.fillRect(rx + rw,       H * 0.18, W * 0.07, H);
+  const dh = H * 0.075, dw = W * 0.012, gap = H * 0.045;
+  const total = dh + gap;
+  ctx.fillStyle = '#e8c84a';
+  for (let y = H * 0.18 - (G.roadOffset % total); y < H; y += total)
+    ctx.fillRect(W / 2 - dw / 2, y, dw, dh);
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.fillRect(rx + W * 0.018, H * 0.18, W * 0.007, H);
+  ctx.fillRect(rx + rw - W * 0.025, H * 0.18, W * 0.007, H);
+}
+
+function drawPump(p) {
+  if (!p.revealed) return;
+  const pulse = 0.82 + 0.18 * Math.sin(p.pulseT * 0.004);
+  ctx.save();
+  ctx.translate(p.x, p.y);
+  ctx.fillStyle = '#555'; ctx.fillRect(-3, 0, 6, H * 0.065);
+  const sw = W * 0.19, sh = H * 0.068;
+  ctx.globalAlpha = p.used ? 1 : pulse;
+  ctx.fillStyle = p.used ? '#333' : (p.hasFuel ? '#145214' : '#521414');
+  ctx.beginPath();
+  ctx.roundRect(-sw / 2, -sh, sw, sh, 7);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+  ctx.font = Math.round(W * 0.052) + 'px serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('⛽', 0, -sh * 0.48);
+  ctx.font = '700 ' + Math.round(W * 0.027) + 'px sans-serif';
+  ctx.fillStyle = p.used ? '#666' : '#fff';
+  ctx.fillText(p.name, 0, -sh * 0.85);
+  if (!p.used) {
+    ctx.font = Math.round(W * 0.021) + 'px sans-serif';
+    ctx.fillStyle = p.hasFuel ? '#80ff80' : '#ff8080';
+    ctx.fillText(p.hasFuel ? 'TEM STOCK' : 'VAZIA', 0, -sh * 1.28);
+  }
+  ctx.restore();
+}
+
+function drawCar() {
+  const c = G.car;
+  ctx.save();
+  ctx.translate(c.x, c.y);
+  ctx.rotate(c.angle);
+  const cw = W * 0.1, ch = H * 0.072;
+  ctx.fillStyle = 'rgba(0,0,0,0.28)';
+  ctx.beginPath(); ctx.ellipse(2, ch * 0.38, cw * 0.42, ch * 0.16, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#e8c84a';
+  ctx.beginPath(); ctx.roundRect(-cw / 2, -ch / 2, cw, ch, 7); ctx.fill();
+  ctx.fillStyle = '#c8a420';
+  ctx.beginPath(); ctx.roundRect(-cw * 0.36, -ch / 2 - ch * 0.36, cw * 0.72, ch * 0.4, 5); ctx.fill();
+  ctx.fillStyle = 'rgba(180,220,255,0.75)';
+  ctx.fillRect(-cw * 0.3, -ch / 2 - ch * 0.3, cw * 0.6, ch * 0.26);
+  ctx.fillStyle = '#111';
+  [[-cw * 0.36, -ch * 0.36], [cw * 0.36, -ch * 0.36], [-cw * 0.36, ch * 0.28], [cw * 0.36, ch * 0.28]].forEach(([wx, wy]) => {
+    ctx.beginPath(); ctx.ellipse(wx, wy, cw * 0.13, ch * 0.14, 0, 0, Math.PI * 2); ctx.fill();
+  });
+  ctx.fillStyle = '#1a1a1a';
+  ctx.font = '700 ' + Math.round(W * 0.022) + 'px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('ZEBITO', 0, ch * 0.1);
+  ctx.restore();
+}
+
+function drawHUD() {
+  ctx.fillStyle = 'rgba(0,0,0,0.55)'; ctx.fillRect(0, 0, W, H * 0.1);
+
+  const fbx = W*0.04, fby = H*0.016, fbw = W*0.44, fbh = H*0.03;
+  ctx.fillStyle = '#2a2a2a'; ctx.beginPath(); ctx.roundRect(fbx, fby, fbw, fbh, 5); ctx.fill();
+  const frac = G.fuel / G.fuelMax;
+  const fcol = frac > 0.4 ? '#4CAF50' : frac > 0.2 ? '#e8c84a' : '#ff4444';
+  const flash = G.flashFuel > 0 && Math.floor(G.flashFuel / 80) % 2 === 0;
+  ctx.fillStyle = flash ? '#ff1111' : fcol;
+  if (frac > 0) { ctx.beginPath(); ctx.roundRect(fbx, fby, fbw * frac, fbh, 5); ctx.fill(); }
+  ctx.fillStyle = '#fff';
+  ctx.font = '700 ' + Math.round(W * 0.028) + 'px sans-serif'; ctx.textAlign = 'left';
+  ctx.fillText('⛽ ' + Math.round(G.fuel) + '%', fbx + 5, fby + fbh * 0.8);
+
+  ctx.fillStyle = '#e8c84a';
+  ctx.font = '900 ' + Math.round(W * 0.052) + 'px sans-serif'; ctx.textAlign = 'right';
+  ctx.fillText(Math.round(G.score), W * 0.96, H * 0.072);
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.font = Math.round(W * 0.026) + 'px sans-serif';
+  ctx.fillText(Math.round(G.km * 10) / 10 + ' km', W * 0.96, H * 0.096);
+
+  if (G.suburbT > 0) {
+    ctx.fillStyle = 'rgba(200,230,160,0.6)'; ctx.textAlign = 'center';
+    ctx.font = Math.round(W * 0.026) + 'px sans-serif';
+    ctx.fillText('📍 ' + G.suburb, W / 2, H * 0.108);
+  }
+
+  if (G.msgT > 0 && G.msg) {
+    ctx.globalAlpha = Math.min(1, G.msgT / 300);
+    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+    ctx.beginPath(); ctx.roundRect(W*0.06, H*0.12, W*0.88, H*0.065, 10); ctx.fill();
+    ctx.fillStyle = G.msg.col;
+    ctx.font = '700 ' + Math.round(W * 0.031) + 'px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(G.msg.txt, W / 2, H * 0.148 + H * 0.02);
+    ctx.globalAlpha = 1;
+  }
+
+  if (G.km < 0.25) {
+    ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.textAlign = 'center';
+    ctx.font = Math.round(W * 0.024) + 'px sans-serif';
+    ctx.fillText('← → mover  |  ↑↓ velocidade  |  toca nas bombas para abastecer', W / 2, H * 0.935);
+  }
+
+  if (G.fuel < 22) {
+    ctx.fillStyle = 'rgba(255,0,0,' + (0.12 + 0.08 * Math.sin(Date.now() * 0.005)) + ')';
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#ff3333';
+    ctx.font = '900 ' + Math.round(W * 0.054) + 'px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('⚠ COMBUSTÍVEL BAIXO!', W / 2, H * 0.52);
+  }
+}
+
+function endGame() {
+  G.running = false;
+  RUNS++;
+  const isNew = G.score > HS;
+  if (isNew) HS = G.score;
+  const kmR = Math.round(G.km * 10) / 10;
+  if (kmR > BKM) BKM = kmR;
+  localStorage.setItem('zeb_hs',   HS);
+  localStorage.setItem('zeb_km',   BKM);
+  localStorage.setItem('zeb_runs', RUNS);
+
+  $('zo-score').textContent = Math.round(G.score);
+  $('zo-km').textContent    = kmR + 'km';
+  $('zo-abast').textContent = G.abasteceu;
+  $('zo-vazias').textContent= G.vazias;
+  $('zo-msg').textContent   = MSGS_EMPTY[Math.floor(Math.random() * MSGS_EMPTY.length)];
+  $('zo-ico').textContent   = G.score > 800 ? '🏆' : G.score > 300 ? '⛽' : '😅';
+  $('znew-best').classList.toggle('show', isNew);
+  setTimeout(() => show('zs-over'), 400);
+}
+</script>
+</body>
+</html>
